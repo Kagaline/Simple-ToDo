@@ -50,6 +50,14 @@ impl Task {
 
         self.status = Status::Holding;
     }
+
+    fn restart(&mut self) {
+        if self.status != Status::Holding {
+            panic!("only holding task can restart.");
+        }
+
+        self.status = Status::Doing;
+    }
 }
 
 fn main() {}
@@ -127,5 +135,37 @@ mod tests {
         task.focus_on();
         task.postpone();
         task.postpone(); // Done -> Holding;
+    }
+
+    #[test]
+    fn test_restart() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.postpone();
+        task.restart();
+    }
+
+    #[test]
+    #[should_panic(expected = "only holding task can restart.")]
+    fn test_try_restart_from_notyet() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.restart();
+    }
+
+    #[test]
+    #[should_panic(expected = "only holding task can restart.")]
+    fn test_try_restart_from_done() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.end_focus();
+        task.restart();
+    }
+
+    #[test]
+    #[should_panic(expected = "only holding task can restart.")]
+    fn test_try_restart_from_doing() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.restart();
     }
 }
