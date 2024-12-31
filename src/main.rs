@@ -31,6 +31,14 @@ impl Task {
 
         self.status = Status::Doing;
     }
+
+    fn end_focus(&mut self) {
+        if self.status != Status::Doing {
+            panic!("this task is not on going.");
+        }
+
+        self.status = Status::Done;
+    }
 }
 
 fn main() {}
@@ -41,13 +49,13 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let task = Task::new("example task", "this task is an example.");
+        let _task = Task::new("example task", "this task is an example.");
     }
 
     #[test]
     #[should_panic(expected = "name cannot be empty.")]
     fn test_new_name_is_empty() {
-        let task = Task::new("", "this task is an example.");
+        let _task = Task::new("", "this task is an example.");
     }
 
     #[test]
@@ -62,5 +70,19 @@ mod tests {
         let mut task = Task::new("example task", "this task is an example.");
         task.focus_on();
         task.focus_on(); // this cause a panic.
+    }
+
+    #[test]
+    fn test_end_focus() {
+        let mut task = Task::new("example task", "this task is an example.");
+        task.focus_on();
+        task.end_focus();
+    }
+
+    #[test]
+    #[should_panic(expected = "this task is not on going.")]
+    fn test_invalid_end_focus() {
+        let mut task = Task::new("example task", "this task is an example.");
+        task.end_focus(); // this cause a panic.
     }
 }
