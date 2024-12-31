@@ -2,6 +2,7 @@
 enum Status {
     NotYet,
     Doing,
+    Holding,
     Done,
 }
 
@@ -40,6 +41,14 @@ impl Task {
         }
 
         self.status = Status::Done;
+    }
+
+    fn postpone(&mut self) {
+        if self.status != Status::Doing {
+            panic!("only doing task can postpone.");
+        }
+
+        self.status = Status::Holding;
     }
 }
 
@@ -86,5 +95,37 @@ mod tests {
     fn test_invalid_end_focus() {
         let mut task = Task::new(0, "example task", "this task is an example.");
         task.end_focus(); // this cause a panic.
+    }
+
+    #[test]
+    fn test_postpone() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.postpone();
+    }
+
+    #[test]
+    #[should_panic(expected = "only doing task can postpone.")]
+    fn test_try_postpone_from_notyet() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.postpone(); // NotYet -> Holding;
+    }
+
+    #[test]
+    #[should_panic(expected = "only doing task can postpone.")]
+    fn test_try_postpone_from_done() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.end_focus();
+        task.postpone(); // Done -> Holding;
+    }
+
+    #[test]
+    #[should_panic(expected = "only doing task can postpone.")]
+    fn test_try_postpone_from_holding() {
+        let mut task = Task::new(0, "example task", "this task is an example.");
+        task.focus_on();
+        task.postpone();
+        task.postpone(); // Done -> Holding;
     }
 }
